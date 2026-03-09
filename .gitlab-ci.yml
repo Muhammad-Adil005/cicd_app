@@ -1,0 +1,73 @@
+image: cirrusci/flutter:stable
+
+stages:
+  - analyze
+  - test
+  - build
+
+variables:
+  FLUTTER_VERSION: "3.24.0"
+
+before_script:
+  - flutter --version
+  - flutter pub get
+
+analyze:
+  stage: analyze
+  script:
+    - dart format --output=none --set-exit-if-changed .
+    - flutter analyze
+  only:
+    - merge_requests
+    - main
+    - develop
+
+test:
+  stage: test
+  script:
+    - flutter test --coverage
+  coverage: '/lines\.*: \d+\.\d+\%/'
+  artifacts:
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage/lcov.info
+  only:
+    - merge_requests
+    - main
+    - develop
+
+build_android:
+  stage: build
+  image: cirrusci/flutter:stable
+  before_script:
+    - apt-get update && apt-get install -y openjdk-17-jdk
+    - export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+    - flutter pub get
+  script:
+    - flutter build apk --release
+    - flutter build appbundle --release
+  artifacts:
+    paths:
+      - build/app/outputs/flutter-apk/app-release.apk
+      - build/app/outputs/bundle/release/app-release.aab
+    expire_in: 1 week
+  only:
+    - main
+    - develop
+    - tags
+
+build_ios:
+  stage: build
+  tags:
+    - macos
+  script:
+    - flutter build ios --release --no-codesign
+  artifacts:
+    paths:
+      - build/ios/iphoneos/
+    expire_in: 1 week
+  only:
+    - main
+    - develop
+    - tags

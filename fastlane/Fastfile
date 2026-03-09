@@ -1,0 +1,43 @@
+default_platform(:android)
+
+platform :android do
+  desc "Build Android APK"
+  lane :build_apk do
+    sh "flutter pub get"
+    sh "flutter build apk --release"
+  end
+
+  desc "Build Android App Bundle"
+  lane :build_appbundle do
+    sh "flutter pub get"
+    sh "flutter build appbundle --release"
+  end
+
+  desc "Deploy to Play Store Internal Testing"
+  lane :deploy_internal do
+    build_appbundle
+    upload_to_play_store(
+      track: 'internal',
+      aab: '../build/app/outputs/bundle/release/app-release.aab'
+    )
+  end
+end
+
+platform :ios do
+  desc "Build iOS App"
+  lane :build do
+    sh "flutter pub get"
+    sh "flutter build ios --release --no-codesign"
+  end
+
+  desc "Deploy to TestFlight"
+  lane :deploy_testflight do
+    build
+    build_app(
+      workspace: "ios/Runner.xcworkspace",
+      scheme: "Runner",
+      export_method: "app-store"
+    )
+    upload_to_testflight
+  end
+end

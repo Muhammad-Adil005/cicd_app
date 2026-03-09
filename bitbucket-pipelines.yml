@@ -1,0 +1,71 @@
+image: cirrusci/flutter:stable
+
+definitions:
+  caches:
+    flutter: ~/.pub-cache
+
+pipelines:
+  default:
+    - step:
+        name: Analyze & Test
+        caches:
+          - flutter
+        script:
+          - flutter --version
+          - flutter pub get
+          - dart format --output=none --set-exit-if-changed .
+          - flutter analyze
+          - flutter test --coverage
+        artifacts:
+          - coverage/**
+    
+    - parallel:
+      - step:
+          name: Build Android
+          caches:
+            - flutter
+          script:
+            - flutter pub get
+            - flutter build apk --release
+            - flutter build appbundle --release
+          artifacts:
+            - build/app/outputs/flutter-apk/app-release.apk
+            - build/app/outputs/bundle/release/app-release.aab
+      
+      - step:
+          name: Build iOS
+          image: cirrusci/flutter:stable
+          script:
+            - flutter pub get
+            - flutter build ios --release --no-codesign
+          artifacts:
+            - build/ios/iphoneos/**
+
+  branches:
+    main:
+      - step:
+          name: Analyze & Test
+          caches:
+            - flutter
+          script:
+            - flutter pub get
+            - flutter analyze
+            - flutter test --coverage
+      
+      - parallel:
+        - step:
+            name: Build & Deploy Android
+            caches:
+              - flutter
+            script:
+              - flutter build apk --release
+              - flutter build appbundle --release
+            artifacts:
+              - build/app/outputs/**
+        
+        - step:
+            name: Build & Deploy iOS
+            script:
+              - flutter build ios --release --no-codesign
+            artifacts:
+              - build/ios/iphoneos/**
