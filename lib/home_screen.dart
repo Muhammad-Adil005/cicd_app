@@ -24,9 +24,7 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         centerTitle: true,
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title,
-
-        ),
+        title: Text(widget.title),
       ),
       body: Center(
         child: Column(
