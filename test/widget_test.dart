@@ -1,6 +1,6 @@
+import 'package:cicd_app/main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:cicd_app/main.dart';
 
 void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
@@ -19,7 +19,7 @@ void main() {
   testWidgets('App has correct title', (WidgetTester tester) async {
     await tester.pumpWidget(const MyApp());
 
-    expect(find.text('Flutter Demo Home Page'), findsOneWidget);
+    expect(find.text('Flutter CICD Demo'), findsOneWidget);
   });
 
   testWidgets('Increment button exists', (WidgetTester tester) async {
