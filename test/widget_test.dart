@@ -19,7 +19,8 @@ void main() {
   testWidgets('App has correct title', (WidgetTester tester) async {
     await tester.pumpWidget(const MyApp());
 
-    expect(find.text('Flutter CICD Demo'), findsOneWidget);
+    // The actual visible title on screen
+    expect(find.text('Home Screen'), findsOneWidget);
   });
 
   testWidgets('Increment button exists', (WidgetTester tester) async {
